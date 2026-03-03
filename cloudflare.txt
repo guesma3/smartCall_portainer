@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare
+    command: tunnel --no-autoupdate run --token eyJhIjoiOGEzNGRhZWFkNTA0ZmYwOGMzMmZmZGM3N2E4ZDMwOTkiLCJ0IjoiZDY2MWYwMzYtNDI0OS00MzBiLWExYjItNjAxNWViNmNlZTBhIiwicyI6Ik5XRmtZek16TW1JdFlqVTROQzAwT1dZd0xUaGlaVGN0TWpJek1USTFaREEwTW1VMiJ9
+    networks:
+      - portainer_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+    # ⚠️ Limitation mémoire légère (cloudflared est très léger, mais on reste prudent)
+    mem_limit: 128m
+    mem_reservation: 64m
+
+    # Réduction des logs (inutile d’en garder beaucoup pour un tunnel)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "2"
+        compress: "true"
+
+networks:
+  portainer_network:
+    external: true
