@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: T5arbi9a
+      MYSQL_DATABASE: db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: T5arbi9a
+      MYSQL_LOG_CONSOLE: "true"
+      TZ: Africa/Casablanca  # Set timezone for MySQL container
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - mysql_logs:/var/log/mysql
+    networks:
+      - portainer_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "10"
+        compress: "true"
+        tag: "mysql"
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "1515:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      PMA_ABSOLUTE_URI: http://localhost:1515/
+      UPLOAD_LIMIT: 128M
+      TZ: Africa/Casablanca  # Set timezone for phpMyAdmin container
+    networks:
+      - portainer_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+        compress: "true"
+        tag: "phpmyadmin"
+
+volumes:
+  mysql_data:
+  mysql_logs:
+
+networks:
+  portainer_network:
+    external: true
